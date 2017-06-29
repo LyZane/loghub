@@ -4,9 +4,31 @@ using System.Linq;
 
 namespace Zane.LogHub.Client
 {
-    public static class Logger
+    public class Logger
     {
-        private static Appender _Appender = Appender.GetSingleton(new FileStorage(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LogRepository")));
+        #region Singleton
+        private static Logger singleton;
+        private Logger(IStorage storage)
+        {
+            _Appender = Appender.GetSingleton(storage);
+        }
+        internal static Logger GetSingleton(IStorage storage)
+        {
+            if (singleton == null)
+            {
+                lock (typeof(Logger))
+                {
+                    if (singleton == null)
+                    {
+                        singleton = new Logger(storage);
+                    }
+                }
+            }
+            return singleton;
+        }
+        #endregion
+
+        private static Appender _Appender;
         public static void Log(string tag, string title, params object[] contents)
         {
             Log(tag, title, contents.Select(a => new ContentEntity(a)).ToArray());

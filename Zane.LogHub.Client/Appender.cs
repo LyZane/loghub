@@ -6,6 +6,8 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Net.Http;
 
 namespace Zane.LogHub.Client
 {
@@ -16,6 +18,12 @@ namespace Zane.LogHub.Client
     {
         #region Singleton
         private static Appender singleton;
+        private Appender(IStorage storage)
+        {
+            this.Storage = storage;
+            Worker = new Thread(Processor);
+            Worker.Start();
+        }
         internal static Appender GetSingleton(IStorage storage)
         {
             if (singleton == null)
@@ -32,33 +40,22 @@ namespace Zane.LogHub.Client
         } 
         #endregion
 
-        private IStorage Storage { get; set; }
+        public IStorage Storage { get; set; }
         static Queue<LogEntity> Works = new Queue<LogEntity>();
         private Thread Worker;
         private bool IsRunning = false;
         
-        private Appender(IStorage storage)
-        {
-            // 检查 Storage 读、写、删 是否正常。
-            try
-            {
-                storage.Enqueue(new LogEntity("InitTest", "This is a test log, used to detect whether the storage object is ok."));
-                storage.Delete(storage.DequeueSingle().Id);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Storage 不可用，请检查 Storage 的 读、写、删 功能是否正常。");
-            }
-            Worker = new Thread(Processor);
-            Worker.Start();
-        }
+        
 
         private void Processor()
         {
             IsRunning = true;
             while (IsRunning)
             {
-                if (Works.Count < 1) { AddWork();continue; }
+                if (Works.Count < 1)
+                {
+                    AddWork();
+                }
                 List<Tuple<LogEntity, string>> package = new List<Tuple<LogEntity, string>>();
                 int length = 0;
                 while (Works.Count > 0)
@@ -66,14 +63,14 @@ namespace Zane.LogHub.Client
                     LogEntity log = Works.Dequeue();
                     var jsonStr = log.ToJsonString();
                     length += jsonStr.Length;
-
+                    package.Add(new Tuple<LogEntity, string>(log,jsonStr));
                     if (length >= 1024 * 1024 * 5)
                     {
                         break;
                     }
                 }
 
-                FileStream packageStream = new FileStream("TestPackage.zip", FileMode.OpenOrCreate);
+                MemoryStream packageStream = new MemoryStream(length);
                 using (ZipArchive zipArchive = new ZipArchive(packageStream, ZipArchiveMode.Create))
                 {
                     foreach (var item in package)
@@ -88,6 +85,20 @@ namespace Zane.LogHub.Client
 
                 using (packageStream){}
 
+                using (var formDataContent = new MultipartFormDataContent())
+                {
+                    formDataContent.Add(new ByteArrayContent(packageStream.ToArray()), "files", "LogPackage.zip");
+                    
+                    using (HttpClient httpClient = new HttpClient())
+                    {
+                        //httpClient.DefaultRequestHeaders
+                        HttpResponseMessage response = httpClient.PostAsync("", formDataContent).Result;
+                        
+                    }
+                }
+
+
+                this.Storage.Delete(package.Select(a=>a.Item1));
                 //var archiveEntity = new ZipArchiveEntry();
                 
 

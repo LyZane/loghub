@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zane.LogHub.Server", "Zane.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zane.LogHub.Client.Test", "Zane.LogHub.Client.Test\Zane.LogHub.Client.Test.csproj", "{7543ABD0-2D77-4DBB-B75B-3BBEB5976E09}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zane.LogHub.Client.CmdDemo", "Zane.LogHub.Client.CmdDemo\Zane.LogHub.Client.CmdDemo.csproj", "{A628A400-D395-4E5D-94D2-F4075B4E1A27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{7543ABD0-2D77-4DBB-B75B-3BBEB5976E09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7543ABD0-2D77-4DBB-B75B-3BBEB5976E09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7543ABD0-2D77-4DBB-B75B-3BBEB5976E09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A628A400-D395-4E5D-94D2-F4075B4E1A27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A628A400-D395-4E5D-94D2-F4075B4E1A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A628A400-D395-4E5D-94D2-F4075B4E1A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A628A400-D395-4E5D-94D2-F4075B4E1A27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

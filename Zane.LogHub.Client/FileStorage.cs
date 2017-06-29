@@ -21,27 +21,31 @@ namespace Zane.LogHub.Client
             }
         }
 
-        public void Delete(params string[] ids)
+        public override void Delete(IEnumerable<LogEntity> logs)
         {
-            foreach (var id in ids)
+            foreach (var log in logs)
             {
-                var path = Path.Combine(_WorkFolder, id + ".log");
-                while (File.Exists(path))
+                Delete(log);
+            }
+        }
+        public override void Delete(LogEntity log)
+        {
+            var path = Path.Combine(_WorkFolder, log.CreateTime.Day.ToString(), log.Id + ".log");
+            while (File.Exists(path))
+            {
+                try
                 {
-                    try
-                    {
-                        File.Delete(path);
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        Thread.Sleep(1000);
-                    }
+                    File.Delete(path);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Thread.Sleep(1000);
                 }
             }
         }
 
-        public LogEntity[] DequeueBatch(int maxCount = 100)
+        public override LogEntity[] DequeueBatch(int maxCount = 100)
         {
             List<LogEntity> result = new List<LogEntity>();
             foreach (var path in Directory.GetFiles(_WorkFolder, "*.log", SearchOption.AllDirectories))
@@ -56,10 +60,10 @@ namespace Zane.LogHub.Client
             return result.ToArray();
         }
 
-        public LogEntity DequeueSingle()
+        public override LogEntity DequeueSingle()
         {
             LogEntity log = null;
-            foreach (var path in Directory.GetFiles(_WorkFolder, "*.log"))
+            foreach (var path in Directory.GetFiles(_WorkFolder, "*.log", SearchOption.AllDirectories))
             {
                 log = File.ReadAllText(path, Encoding.UTF8).Convert2Model<LogEntity>();
                 break;
@@ -67,9 +71,11 @@ namespace Zane.LogHub.Client
             return log;
         }
 
-        public void Enqueue(LogEntity log)
+        public override void Enqueue(LogEntity log)
         {
-            File.WriteAllText(Path.Combine(_WorkFolder, log.CreateTime.Day.ToString(), log.Id + ".log"), log.ToJsonString(), Encoding.UTF8);
+            string folder = Path.Combine(_WorkFolder, log.CreateTime.Day.ToString());
+            Directory.CreateDirectory(folder);
+            File.WriteAllText(Path.Combine(folder, log.Id + ".log"), log.ToJsonString(), Encoding.UTF8);
         }
     }
 }

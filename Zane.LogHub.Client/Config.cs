@@ -30,7 +30,20 @@ namespace Zane.LogHub.Client
                 throw new MethodAccessException("Zane.LogHub.Client is Initialized.");
             }
         }
-
+        public static Configuration SetStorage(this Configuration config, IStorage storage)
+        {
+            if (Initialized)
+            {
+                throw new MethodAccessException("Must be before initialization.");
+            }
+            if (storage==null)
+            {
+                throw new ArgumentNullException(nameof(storage));
+            }
+            storage.Test();
+            Logger.GetSingleton(storage);
+            return config;
+        }
         public static Configuration SetCloudHost(this Configuration config, Uri host, bool check = false)
         {
             if (Initialized)
@@ -50,10 +63,6 @@ namespace Zane.LogHub.Client
         
         public static Configuration CatchGlobeException(this Configuration config)
         {
-            if (!Initialized)
-            {
-                throw new MethodAccessException("Must be after initialization.");
-            }
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             TaskScheduler.UnobservedTaskException += UnobservedTaskException;
             return config;
