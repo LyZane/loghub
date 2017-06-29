@@ -1,1 +1,0 @@
-{"Id":"--86063b68-17a8-4b06-b025-d30ff2ea84ce","Tag":"InitTest","Title":"This is a test log, used to detect whether the storage object is ok.","Contents":[],"Timestamp":1498759565751,"CreateTime":"2017-06-29T18:06:05.7517266+08:00","ApplicationId":null,"UDID":"DESKTOP-6LAMF1S","DeviceModel":null,"DeviceNickName":null,"OsVersion_Str":null,"OsVersion_Num":null,"AppVersion":null}
