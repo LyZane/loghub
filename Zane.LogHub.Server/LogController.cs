@@ -8,7 +8,7 @@ using System.Text;
 namespace Zane.LogHub.Server
 {
     [Route("api/[controller]")]
-    public class LogController: Controller
+    public class LogController : Controller
     {
         public string Get()
         {
@@ -16,10 +16,10 @@ namespace Zane.LogHub.Server
         }
 
         [HttpPost]
-        public string Post([FromBody]IFormFile file)
+        public ActionResult Post(IFormFile file)
         {
-            LogPackageReceiver.Receive(file,Request.HttpContext.Connection.RemoteIpAddress.ToString());
-            return "ok";
+            LogPackageReceiver.Receive(file, Request.HttpContext.Connection.RemoteIpAddress.ToString());
+            return Ok(file.Length);
         }
     }
 }

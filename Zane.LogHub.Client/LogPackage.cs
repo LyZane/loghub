@@ -7,6 +7,9 @@ namespace Zane.LogHub.Client
 {
     internal class LogPackage:IEnumerable<Tuple<LogEntity, string>>
     {
+        /// <summary>
+        /// This is string length,not byte array length.
+        /// </summary>
         internal int ContentLength { get; private set; }
         private List<Tuple<LogEntity, string>> Logs = new List<Tuple<LogEntity, string>>();
         

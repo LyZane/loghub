@@ -45,7 +45,7 @@ namespace Zane.LogHub.Client
             }
         }
 
-        public override LogEntity[] DequeueBatch(int maxCount = 100)
+        public override LogEntity[] DequeueBatch(int maxCount = 1000)
         {
             List<LogEntity> result = new List<LogEntity>();
             foreach (var path in Directory.GetFiles(_WorkFolder, "*.log", SearchOption.AllDirectories))
@@ -73,9 +73,9 @@ namespace Zane.LogHub.Client
 
         public override void Enqueue(LogEntity log)
         {
-            string folder = Path.Combine(_WorkFolder, log.CreateTime.Day.ToString());
-            Directory.CreateDirectory(folder);
-            File.WriteAllText(Path.Combine(folder, log.Id + ".log"), log.ToJsonString(), Encoding.UTF8);
+            string path = Path.Combine(_WorkFolder, log.Id);
+            File.WriteAllText(path + ".temp", log.ToJsonString(), Encoding.UTF8);
+            File.Move(path + ".temp", path + ".log");
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Zane.LogHub.Web
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
 
-            Server.LogPackageReceiver.CreateSingleton(Path.Combine(env.ContentRootPath, "LogHubServerWorkFolder"));
+            Server.LogPackageReceiver.CreateSingleton(Path.Combine(@"D://LogHubServerWorkFolder"));
         }
 
         public IConfigurationRoot Configuration { get; }

@@ -91,8 +91,9 @@ namespace Zane.LogHub.Client
 
         private bool Send(LogPackage package)
         {
-            // 将 package 中的所有日志压缩成一个 zip 对象，并存放在 MemoryStream 中。
+
             MemoryStream packageStream = new MemoryStream(package.ContentLength);
+            // 将 package 中的所有日志压缩成一个 zip 对象，并存放在 MemoryStream 中。
             using (ZipArchive zipArchive = new ZipArchive(packageStream, ZipArchiveMode.Create))
             {
                 foreach (var item in package)
@@ -105,24 +106,38 @@ namespace Zane.LogHub.Client
                 }
             }
 
-            
-            // 将 zip 对象所在的 MemoryStream 以文件的形式发送到服务器端。
-            using (var formDataContent = new MultipartFormDataContent())
+            var zipData = packageStream.ToArray();
+            packageStream.Dispose();
+
+            // 将 zipData 以文件的形式发送到服务器端。
+            //var formDataContent = new MultipartFormDataContent();
+            //
+            //formDataContent.Headers.ContentLength = zipData.Length;
+
+            //// 以文件的形式上传 zip 对象
+            //var fileContent = new ByteArrayContent(zipData);
+            //fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { Name = "file", FileName = "LogPackage.zip" };
+            //formDataContent.Add(fileContent);
+
+            using (HttpClient httpClient = new HttpClient() { DefaultRequestHeaders = { Authorization = GlobalConfiguration.Current.HttpAuthValue } })
             {
-                var zipData = packageStream.ToArray();
+                MultipartFormDataContent formDataContent = new MultipartFormDataContent();
                 // 添加 zip 对象的 MD5 值
                 formDataContent.Headers.ContentMD5 = MD5.Create().ComputeHash(zipData);
-                // 以文件的形式上传 zip 对象
-                formDataContent.Add(new ByteArrayContent(zipData), "files", "LogPackage.zip");
-                
-                using (HttpClient httpClient = new HttpClient() { DefaultRequestHeaders = { Authorization = GlobalConfiguration.Current.HttpAuthValue } })
+                ByteArrayContent bytes = new ByteArrayContent(zipData);
+                formDataContent.Add(bytes, "file", "LogPackage.zip");
+
+                HttpResponseMessage response = httpClient.PostAsync(GlobalConfiguration.Current.ServerUrl_Upload, formDataContent).Result;
+                Console.WriteLine($"上传{package.Count()}条日志完毕，结果：{response.IsSuccessStatusCode}");
+                string checkLength = response.Content.ReadAsStringAsync().Result;
+                if (!response.IsSuccessStatusCode|| zipData.Length.ToString()!= checkLength)
                 {
-                    HttpResponseMessage response = httpClient.PostAsync(GlobalConfiguration.Current.ServerUrl_Upload, formDataContent).Result;
+
                 }
+                return response.IsSuccessStatusCode;
             }
 
-            using (packageStream) { }
-            return true;
+
         }
 
 
@@ -140,7 +155,7 @@ namespace Zane.LogHub.Client
 
             if (list.Length < 1)
             {
-                Thread.Sleep(10000); //休息10秒钟
+                Thread.Sleep(1000 * 10); //休息10秒钟
                 AddWork();
             }
         }

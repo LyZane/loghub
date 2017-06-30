@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Zane.LogHub.Server
 {
@@ -31,12 +32,14 @@ namespace Zane.LogHub.Server
         #endregion
 
         private static string WorkFolder { get; set; }
-        public static void Receive(IFormFile file,string ip)
+        public static void Receive(IFormFile formFile,string ip)
         {
-            using (var stream = new FileStream(Path.Combine(WorkFolder,Path.GetRandomFileName()), FileMode.Create))
+            string path = Path.Combine(WorkFolder, Path.GetRandomFileName());
+            using (var stream = new FileStream(path + ".temp", FileMode.Create))
             {
-                file.CopyToAsync(stream);
+                formFile.CopyTo(stream);
             }
+            File.Move(path + ".temp", path + ".zip");
         }
     }
 }
