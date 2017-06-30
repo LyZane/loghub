@@ -129,11 +129,6 @@ namespace Zane.LogHub.Client
 
                 HttpResponseMessage response = httpClient.PostAsync(GlobalConfiguration.Current.ServerUrl_Upload, formDataContent).Result;
                 Console.WriteLine($"上传{package.Count()}条日志完毕，结果：{response.IsSuccessStatusCode}");
-                string checkLength = response.Content.ReadAsStringAsync().Result;
-                if (!response.IsSuccessStatusCode|| zipData.Length.ToString()!= checkLength)
-                {
-
-                }
                 return response.IsSuccessStatusCode;
             }
 

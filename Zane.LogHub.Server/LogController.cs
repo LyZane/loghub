@@ -7,6 +7,7 @@ using System.Text;
 
 namespace Zane.LogHub.Server
 {
+    [BasicAuthorizationFilter]
     [Route("api/[controller]")]
     public class LogController : Controller
     {
@@ -19,7 +20,7 @@ namespace Zane.LogHub.Server
         public ActionResult Post(IFormFile file)
         {
             LogPackageReceiver.Receive(file, Request.HttpContext.Connection.RemoteIpAddress.ToString());
-            return Ok(file.Length);
+            return Ok("ok");
         }
     }
 }
