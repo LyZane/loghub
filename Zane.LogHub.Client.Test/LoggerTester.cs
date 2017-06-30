@@ -12,7 +12,11 @@ namespace Zane.LogHub.Client.Test
     {
         public LoggerTester()
         {
-            GlobalConfiguration.Configuration.CatchGlobeException().Startup();
+            GlobalConfiguration.Current
+                .SetServerHost(new Uri("http://localhost:19503"))
+                .CatchGlobeException()
+                .SetStorage(new FileStorage(@"D://LogHubClientWorkFolder"))
+                .Startup("TestAppId", "TestAppToken");
         }
         [TestMethod]
         public void TestLog()

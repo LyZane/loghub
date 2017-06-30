@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Net.Http.Headers;
 
 namespace Zane.LogHub.Client
 {
@@ -37,15 +39,15 @@ namespace Zane.LogHub.Client
                 }
             }
             return singleton;
-        } 
+        }
         #endregion
 
         public IStorage Storage { get; set; }
         static Queue<LogEntity> Works = new Queue<LogEntity>();
         private Thread Worker;
         private bool IsRunning = false;
-        
-        
+
+
 
         private void Processor()
         {
@@ -56,182 +58,77 @@ namespace Zane.LogHub.Client
                 {
                     AddWork();
                 }
-                List<Tuple<LogEntity, string>> package = new List<Tuple<LogEntity, string>>();
-                int length = 0;
+
+                LogPackage package = new LogPackage();
                 while (Works.Count > 0)
                 {
-                    LogEntity log = Works.Dequeue();
-                    var jsonStr = log.ToJsonString();
-                    length += jsonStr.Length;
-                    package.Add(new Tuple<LogEntity, string>(log,jsonStr));
-                    if (length >= 1024 * 1024 * 5)
+                    package.Add(Works.Dequeue());
+                    if (package.ContentLength >= 1024 * 1024 * 5)
                     {
                         break;
                     }
                 }
 
-                MemoryStream packageStream = new MemoryStream(length);
-                using (ZipArchive zipArchive = new ZipArchive(packageStream, ZipArchiveMode.Create))
+                // 将日志发往服务器端
+                if (Send(package))
                 {
+                    // 发送成功后在本地 Storage 中删除日志
+                    this.Storage.Delete(package.Select(a => a.Item1));
+                }
+                else
+                {
+                    // 发送失败后将日志追加到发送队列末端，等待重试。
                     foreach (var item in package)
                     {
-                        ZipArchiveEntry entity = zipArchive.CreateEntry(item.Item1.Id + ".txt");
-                        using (StreamWriter writer = new StreamWriter(entity.Open()))
-                        {
-                            writer.Write(item.Item2);
-                        }
-                    }
-                }
-
-                using (packageStream){}
-
-                using (var formDataContent = new MultipartFormDataContent())
-                {
-                    formDataContent.Add(new ByteArrayContent(packageStream.ToArray()), "files", "LogPackage.zip");
-                    
-                    using (HttpClient httpClient = new HttpClient())
-                    {
-                        //httpClient.DefaultRequestHeaders
-                        HttpResponseMessage response = httpClient.PostAsync("", formDataContent).Result;
-                        
+                        Works.Enqueue(item.Item1);
                     }
                 }
 
 
-                this.Storage.Delete(package.Select(a=>a.Item1));
-                //var archiveEntity = new ZipArchiveEntry();
-                
-
-                //bool result = false;
-                //for (int i = 0; i < 3; i++) //请求3次
-                //{
-                //    result = PostRequest(Setting.API_URL_Log, fileInfo.FullName, Guid.NewGuid().ToString());
-                //    if (result)
-                //    {
-                //        break;
-                //    }
-                //}
-
-                //if (!result)
-                //{
-                //    works.Enqueue(fileInfo.FullName);
-                //}
-                //else
-                //{
-                //    DeleteFile(fileInfo);
-                //}
             }
         }
 
 
-        //private static bool PostRequest(string url, string fileNamePath, string saveName)
-        //{
-        //    FileStream fs;
-        //    BinaryReader r;
-        //    try
-        //    {
-        //        fs = new FileStream(fileNamePath, FileMode.Open, FileAccess.Read, FileShare.None);
-        //        r = new BinaryReader(fs);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        if (!File.Exists(fileNamePath))
-        //        {
-        //            return true;
-        //        }
-        //        return false;
-        //    }
+        private bool Send(LogPackage package)
+        {
+            // 将 package 中的所有日志压缩成一个 zip 对象，并存放在 MemoryStream 中。
+            MemoryStream packageStream = new MemoryStream(package.ContentLength);
+            using (ZipArchive zipArchive = new ZipArchive(packageStream, ZipArchiveMode.Create))
+            {
+                foreach (var item in package)
+                {
+                    ZipArchiveEntry entity = zipArchive.CreateEntry(item.Item1.Id + ".txt");
+                    using (StreamWriter writer = new StreamWriter(entity.Open()))
+                    {
+                        writer.Write(item.Item2);
+                    }
+                }
+            }
+
+            
+            // 将 zip 对象所在的 MemoryStream 以文件的形式发送到服务器端。
+            using (var formDataContent = new MultipartFormDataContent())
+            {
+                var zipData = packageStream.ToArray();
+                // 添加 zip 对象的 MD5 值
+                formDataContent.Headers.ContentMD5 = MD5.Create().ComputeHash(zipData);
+                // 以文件的形式上传 zip 对象
+                formDataContent.Add(new ByteArrayContent(zipData), "files", "LogPackage.zip");
+                
+                using (HttpClient httpClient = new HttpClient() { DefaultRequestHeaders = { Authorization = GlobalConfiguration.Current.HttpAuthValue } })
+                {
+                    HttpResponseMessage response = httpClient.PostAsync(GlobalConfiguration.Current.ServerUrl_Upload, formDataContent).Result;
+                }
+            }
+
+            using (packageStream) { }
+            return true;
+        }
 
 
-        //    //时间戳 
-        //    string strBoundary = "----------" + DateTime.Now.Ticks.ToString("x");
-        //    byte[] boundaryBytes = Encoding.ASCII.GetBytes("\r\n--" + strBoundary + "\r\n");
-
-        //    //请求头部信息 
-        //    StringBuilder sb = new StringBuilder();
-        //    sb.Append("--");
-        //    sb.Append(strBoundary);
-        //    sb.Append("\r\n");
-        //    sb.Append("Content-Disposition: form-data; name=\"");
-        //    sb.Append("file");
-        //    sb.Append("\"; filename=\"");
-        //    sb.Append(saveName);
-        //    sb.Append("\"");
-        //    sb.Append("\r\n");
-        //    sb.Append("Content-Type: ");
-        //    sb.Append("application/octet-stream");
-        //    sb.Append("\r\n");
-        //    sb.Append("\r\n");
-        //    string strPostHeader = sb.ToString();
-        //    byte[] postHeaderBytes = Encoding.UTF8.GetBytes(strPostHeader);
-
-        //    // 根据uri创建HttpWebRequest对象 
-        //    HttpWebRequest httpReq = (HttpWebRequest)WebRequest.Create(new Uri(url));
-        //    httpReq.Method = "POST";
-
-        //    //对发送的数据不使用缓存 
-        //    httpReq.AllowWriteStreamBuffering = false;
-
-        //    //设置获得响应的超时时间（30秒） 
-        //    httpReq.Timeout = 30000;
-        //    httpReq.ContentType = "multipart/form-data; boundary=" + strBoundary;
-        //    long length = fs.Length + postHeaderBytes.Length + boundaryBytes.Length;
-        //    long fileLength = fs.Length;
-        //    httpReq.ContentLength = length;
-        //    try
-        //    {
-        //        //每次上传4k 
-        //        int bufferLength = 4096;
-        //        byte[] buffer = new byte[bufferLength];
-
-        //        //已上传的字节数 
-        //        long offset = 0;
-
-        //        //开始上传时间 
-        //        DateTime startTime = DateTime.Now;
-        //        int size = r.Read(buffer, 0, bufferLength);
-        //        Stream postStream = httpReq.GetRequestStream();
-
-        //        //发送请求头部消息 
-        //        postStream.Write(postHeaderBytes, 0, postHeaderBytes.Length);
-        //        while (size > 0)
-        //        {
-        //            postStream.Write(buffer, 0, size);
-        //            offset += size;
-        //            size = r.Read(buffer, 0, bufferLength);
-        //        }
-        //        //添加尾部的时间戳 
-        //        postStream.Write(boundaryBytes, 0, boundaryBytes.Length);
-        //        postStream.Close();
-
-        //        //获取服务器端的响应
-        //        WebResponse webRespon = httpReq.GetResponse();
-        //        Stream s = webRespon.GetResponseStream();
-        //        StreamReader sr = new StreamReader(s);
-
-        //        //读取服务器端返回的消息 
-        //        String sReturnString = sr.ReadLine();
-        //        if (sReturnString != "ok")
-        //        {
-        //            throw new Exception();
-        //        }
-        //        s.Close();
-        //        sr.Close();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return false;
-        //    }
-        //    finally
-        //    {
-        //        fs.Close();
-        //        r.Close();
-        //    }
-        //    return true;
-        //}
         internal void AddWork()
         {
-            if (Works.Count >1)
+            if (Works.Count > 1)
             {
                 return;
             }
@@ -249,8 +146,8 @@ namespace Zane.LogHub.Client
         }
         internal void Save(LogEntity log)
         {
-            Task.Run(()=>this.Storage.Enqueue(log));
+            Task.Run(() => this.Storage.Enqueue(log));
         }
-         
+
     }
 }

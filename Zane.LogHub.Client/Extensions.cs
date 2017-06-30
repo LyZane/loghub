@@ -3,12 +3,27 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Zane.LogHub.Client
 {
     public static class Extensions
     {
+        /// <summary>
+        /// 计算 byte[] 的MD5值。
+        /// </summary>
+        /// <param name="arr"></param>
+        /// <returns></returns>
+        public static string MD5Encrypt(this byte[] arr)
+        {
+            using (var md5 = MD5.Create())
+            {
+                var result = md5.ComputeHash(arr);
+                return Encoding.ASCII.GetString(result);
+            }
+        }
+
         /// <summary>
         /// 把DateTime转成时间戳
         /// 精确到毫秒级别

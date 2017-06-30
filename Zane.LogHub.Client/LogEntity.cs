@@ -8,13 +8,13 @@ namespace Zane.LogHub.Client
     {
         public LogEntity(string tag, string title, params ContentEntity[] contents)
         {
-            this.Id = Setting.ApplicationId + "--" + Guid.NewGuid();
+            this.Id = GlobalConfiguration.Current.ApplicationId + "--" + Guid.NewGuid();
             this.Tag = tag;
             this.Title = title;
             this.Contents = contents;
             this.CreateTime = DateTime.Now;
             this.Timestamp = this.CreateTime.ToUnixTime();
-            this.ApplicationId = Setting.ApplicationId;
+            this.ApplicationId = GlobalConfiguration.Current.ApplicationId;
             this.UDID = BaseProperty.UDID;
             this.DeviceModel = BaseProperty.DeviceModel;
             this.DeviceNickName = BaseProperty.DeviceNickName;

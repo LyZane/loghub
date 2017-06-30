@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.IO;
 
 namespace Zane.LogHub.Web
 {
@@ -20,6 +21,8 @@ namespace Zane.LogHub.Web
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+
+            Server.LogPackageReceiver.CreateSingleton(Path.Combine(env.ContentRootPath, "LogHubServerWorkFolder"));
         }
 
         public IConfigurationRoot Configuration { get; }

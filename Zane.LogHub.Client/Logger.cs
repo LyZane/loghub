@@ -7,24 +7,26 @@ namespace Zane.LogHub.Client
     public class Logger
     {
         #region Singleton
-        private static Logger singleton;
+        public static Logger Singleton;
         private Logger(IStorage storage)
         {
             _Appender = Appender.GetSingleton(storage);
         }
-        internal static Logger GetSingleton(IStorage storage)
+        internal static void CreateSingleton(IStorage storage)
         {
-            if (singleton == null)
+            if (Singleton == null)
             {
                 lock (typeof(Logger))
                 {
-                    if (singleton == null)
+                    if (Singleton == null)
                     {
-                        singleton = new Logger(storage);
+                        if (storage.Test())
+                        {
+                            Singleton = new Logger(storage);
+                        }
                     }
                 }
             }
-            return singleton;
         }
         #endregion
 
@@ -35,6 +37,10 @@ namespace Zane.LogHub.Client
         }
         public static void Log(string tag, string title, params ContentEntity[] contents)
         {
+            if (Singleton==null)
+            {
+                throw new Exception("Must be after initialization Logger.");
+            }
             _Appender.Save(new LogEntity(tag,title,contents));
         }
     }
