@@ -24,7 +24,7 @@ namespace Zane.LogHub.Client
         /// </summary>
         /// <param name="maxCount">允许的最大日志条数。</param>
         /// <returns></returns>
-        public abstract LogEntity[] DequeueBatch(int maxCount = 1000);
+        public abstract LogEntity[] DequeueBatch(int maxCount = 10000);
 
         /// <summary>
         /// 删除 Storage 中的 LogEntity

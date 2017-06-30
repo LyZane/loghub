@@ -23,8 +23,8 @@ namespace Zane.LogHub.Client.CmdDemo
 
             while (true)
             {
-                Logger.Log("Unit Test", DateTime.Now.ToString(), DateTime.Now);
-                Thread.Sleep(10);
+                Logger.Log("Unit Test", DateTime.Now.ToString(), AppDomain.CurrentDomain);
+                Thread.Sleep(1);
             }
 
             Console.ReadLine();

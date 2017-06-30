@@ -30,7 +30,7 @@ namespace Zane.LogHub.Client
         }
         public override void Delete(LogEntity log)
         {
-            var path = Path.Combine(_WorkFolder, log.CreateTime.Day.ToString(), log.Id + ".log");
+            var path = Path.Combine(_WorkFolder,log.CreateTime.ToString("yyyy-MM-dd"), log.Id + ".log");
             while (File.Exists(path))
             {
                 try
@@ -45,13 +45,20 @@ namespace Zane.LogHub.Client
             }
         }
 
-        public override LogEntity[] DequeueBatch(int maxCount = 1000)
+        public override LogEntity[] DequeueBatch(int maxCount = 10000)
         {
             List<LogEntity> result = new List<LogEntity>();
             foreach (var path in Directory.GetFiles(_WorkFolder, "*.log", SearchOption.AllDirectories))
             {
-                var log = File.ReadAllText(path, Encoding.UTF8).Convert2Model<LogEntity>();
-                result.Add(log);
+                try
+                {
+                    var log = File.ReadAllText(path, Encoding.UTF8).Convert2Model<LogEntity>();
+                    result.Add(log);
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
                 if (result.Count >= maxCount)
                 {
                     break;
@@ -73,7 +80,12 @@ namespace Zane.LogHub.Client
 
         public override void Enqueue(LogEntity log)
         {
-            string path = Path.Combine(_WorkFolder, log.Id);
+            string folder = Path.Combine(_WorkFolder, log.CreateTime.ToString("yyyy-MM-dd"));
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+            string path = Path.Combine(folder, log.Id);
             File.WriteAllText(path + ".temp", log.ToJsonString(), Encoding.UTF8);
             File.Move(path + ".temp", path + ".log");
         }

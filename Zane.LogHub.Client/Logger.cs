@@ -10,7 +10,7 @@ namespace Zane.LogHub.Client
         public static Logger Singleton;
         private Logger(IStorage storage)
         {
-            _Appender = Appender.GetSingleton(storage);
+            _Appender = LogManager.GetSingleton(storage);
         }
         internal static void CreateSingleton(IStorage storage)
         {
@@ -30,7 +30,7 @@ namespace Zane.LogHub.Client
         }
         #endregion
 
-        private static Appender _Appender;
+        private static LogManager _Appender;
         public static void Log(string tag, string title, params object[] contents)
         {
             Log(tag, title, contents.Select(a => new ContentEntity(a)).ToArray());

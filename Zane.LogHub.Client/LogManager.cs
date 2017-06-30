@@ -16,25 +16,25 @@ namespace Zane.LogHub.Client
     /// <summary>
     /// 将日志追加到本地库，再从本地库转移到服务器端。
     /// </summary>
-    internal class Appender
+    internal class LogManager
     {
         #region Singleton
-        private static Appender singleton;
-        private Appender(IStorage storage)
+        private static LogManager singleton;
+        private LogManager(IStorage storage)
         {
             this.Storage = storage;
             Worker = new Thread(Processor);
             Worker.Start();
         }
-        internal static Appender GetSingleton(IStorage storage)
+        internal static LogManager GetSingleton(IStorage storage)
         {
             if (singleton == null)
             {
-                lock (typeof(Appender))
+                lock (typeof(LogManager))
                 {
                     if (singleton == null)
                     {
-                        singleton = new Appender(storage);
+                        singleton = new LogManager(storage);
                     }
                 }
             }
@@ -147,7 +147,7 @@ namespace Zane.LogHub.Client
             {
                 return;
             }
-            LogEntity[] list = this.Storage.DequeueBatch();
+            LogEntity[] list = this.Storage.DequeueBatch(10000);
             foreach (var item in list)
             {
                 Works.Enqueue(item);
