@@ -36,7 +36,7 @@ namespace Zane.LogHub.Server
         private static string WorkFolder { get; set; }
         public static void Receive(IFormFile formFile,string appId,string ip)
         {
-            string path = Path.Combine(WorkFolder, $"{appId}--{ip.Replace(":",".")}--{Path.GetRandomFileName()}");
+            string path = Path.Combine(WorkFolder, $"{appId}--{ip.Replace(":","0.")}--{Path.GetRandomFileName()}");
             using (var stream = new FileStream(path + ".temp", FileMode.Create))
             {
                 formFile.CopyTo(stream);
