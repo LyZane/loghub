@@ -8,7 +8,7 @@ namespace Zane.LogHub.Client
     {
         public LogEntity(string tag, string title, params ContentEntity[] contents)
         {
-            this.Id = GlobalConfiguration.Current.ApplicationId + "--" + Guid.NewGuid();
+            this.Id = Guid.NewGuid().ToString();
             this.Tag = tag;
             this.Title = title;
             this.Contents = contents;

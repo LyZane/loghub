@@ -23,8 +23,10 @@ namespace Zane.LogHub.Server
                 {
                     if (singleton == null)
                     {
+                        // TODO: 检查文件夹的 读、写、删 权限
                         Directory.CreateDirectory(workFolder);
                         singleton = new LogPackageReceiver(workFolder);
+                        LogPackageProcessor.Start(workFolder);
                     }
                 }
             }
@@ -32,9 +34,9 @@ namespace Zane.LogHub.Server
         #endregion
 
         private static string WorkFolder { get; set; }
-        public static void Receive(IFormFile formFile,string ip)
+        public static void Receive(IFormFile formFile,string appId,string ip)
         {
-            string path = Path.Combine(WorkFolder, Path.GetRandomFileName());
+            string path = Path.Combine(WorkFolder, $"{appId}--{ip.Replace(":",".")}--{Path.GetRandomFileName()}");
             using (var stream = new FileStream(path + ".temp", FileMode.Create))
             {
                 formFile.CopyTo(stream);

@@ -11,16 +11,16 @@ namespace Zane.LogHub.Server
     [Route("api/[controller]")]
     public class LogController : Controller
     {
-        public string Get()
+        public ApiResult Get()
         {
-            return "ok";
+            return ApiResult.Sucess(null, "ok");
         }
 
         [HttpPost]
-        public ActionResult Post(IFormFile file)
+        public ApiResult Post(IFormFile file)
         {
-            LogPackageReceiver.Receive(file, Request.HttpContext.Connection.RemoteIpAddress.ToString());
-            return Ok("ok");
+            LogPackageReceiver.Receive(file, Request.Headers["ApplicationId"][0],Request.HttpContext.Connection.RemoteIpAddress.ToString());
+            return ApiResult.Sucess();
         }
     }
 }

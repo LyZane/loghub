@@ -82,6 +82,8 @@ namespace Zane.LogHub.Client
                     {
                         Works.Enqueue(item.Item1);
                     }
+                    // 发送失败通常是网络原因，等待一分钟后继续。
+                    Thread.Sleep(1000*60);
                 }
 
 
@@ -124,6 +126,7 @@ namespace Zane.LogHub.Client
                 MultipartFormDataContent formDataContent = new MultipartFormDataContent();
                 // 添加 zip 对象的 MD5 值
                 formDataContent.Headers.ContentMD5 = MD5.Create().ComputeHash(zipData);
+                formDataContent.Headers.Add("ApplicationId", GlobalConfiguration.Current.ApplicationId);
                 ByteArrayContent bytes = new ByteArrayContent(zipData);
                 formDataContent.Add(bytes, "file", "LogPackage.zip");
 

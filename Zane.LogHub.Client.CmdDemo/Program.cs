@@ -15,7 +15,7 @@ namespace Zane.LogHub.Client.CmdDemo
                 .SetServerHost(new Uri("http://localhost:19503"))
                 .CatchGlobeException()
                 .SetStorage(new FileStorage(@"D://LogHubClientWorkFolder"))
-                .Startup("TestAppId", "TestAppToken");
+                .Startup("TestApp", "TestToken");
 
             //Logger.Log("Unit Test", DateTime.Now.ToString(), DateTime.Now);
             //Console.WriteLine("loged");
@@ -23,6 +23,8 @@ namespace Zane.LogHub.Client.CmdDemo
 
             while (true)
             {
+                Console.WriteLine("按任意键写入一条日志：");
+                Console.ReadKey();
                 Logger.Log("Unit Test", DateTime.Now.ToString(), AppDomain.CurrentDomain);
                 Thread.Sleep(1);
             }

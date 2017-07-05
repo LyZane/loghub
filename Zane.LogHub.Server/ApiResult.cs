@@ -18,7 +18,7 @@ namespace Zane.LogHub.Server
             return new ApiResult() { Success = false, Message = message };
         }
 
-        public static ApiResult Sucess(object data, string message = "success")
+        public static ApiResult Sucess(object data=null, string message = "success")
         {
             return new ApiResult() { Success = true, Data = data, Message = message };
         }
