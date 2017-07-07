@@ -83,15 +83,10 @@ namespace Zane.LogHub.Server
             }
             // 修改文件名，标记此 LogPackage 处于被处理中。
             File.Move(path, path + ".processing");
-            // 文件名格式：{appId}--{ip}--{Path.GetRandomFileName()}
-            var temp = package.Name.Split(new string[] { "--" },StringSplitOptions.RemoveEmptyEntries);
-            if (temp.Length!=3)
-            {
-                throw new Exception("LogPackage未按约定设置文件名。");
-            }
-            string appId = temp[0];
-            string ip = temp[1];
-            string extractFolder = Path.Combine(WorkFolder,appId, ip);
+            
+            var temp = ResolveFileName(package.Name);
+            string extractFolder = Path.Combine(WorkFolder, temp.appId, temp.ip);
+
             if (!Directory.Exists(extractFolder))
             {
                 Directory.CreateDirectory(extractFolder);
@@ -99,6 +94,28 @@ namespace Zane.LogHub.Server
             ZipFile.ExtractToDirectory(path + ".processing", Path.Combine(WorkFolder, extractFolder));
             File.Delete(path + ".processing");
         }
-        
+
+        /// <summary>
+        /// 从文件名中提取出 appId 和 IP。
+        /// 文件名格式：{appId}--{ip}--{Path.GetRandomFileName()}.xxx
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private static (string appId, string ip) ResolveFileName(string fileName)
+        {
+            var temp = fileName.Split(new string[] { "--" }, StringSplitOptions.RemoveEmptyEntries);
+            if (temp.Length != 3)
+            {
+                throw new Exception("LogPackage未按约定设置文件名。");
+            }
+            string appId = temp[0];
+            string ip = temp[1];
+            return (appId, ip);
+        }
+
+        internal static string CreateLogPackageFileName(string appId,string ip)
+        {
+            return Path.Combine(WorkFolder, $"{appId}--{ip.Replace(":", "0.")}--{Path.GetRandomFileName()}");
+        }
     }
 }

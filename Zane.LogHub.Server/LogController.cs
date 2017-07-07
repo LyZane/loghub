@@ -19,8 +19,16 @@ namespace Zane.LogHub.Server
         [HttpPost]
         public ApiResult Post(IFormFile file)
         {
-            LogPackageReceiver.Receive(file, Request.Headers["ApplicationId"][0],Request.HttpContext.Connection.RemoteIpAddress.ToString());
-            return ApiResult.Sucess();
+            try
+            {
+                LogPackageReceiver.Receive(file, Request.Headers["Content-MD5"], Request.Headers["ApplicationId"][0], Request.HttpContext.Connection.RemoteIpAddress.ToString());
+                return ApiResult.Sucess();
+            }
+            catch (Exception ex)
+            {
+                return ApiResult.Fail(ex);
+            }
+            
         }
     }
 }

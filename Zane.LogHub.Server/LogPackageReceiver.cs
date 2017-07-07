@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,9 +36,23 @@ namespace Zane.LogHub.Server
         #endregion
 
         private static string WorkFolder { get; set; }
-        public static void Receive(IFormFile formFile,string appId,string ip)
+        public static void Receive(IFormFile formFile,StringValues md5Headers,string appId,string ip)
         {
-            string path = Path.Combine(WorkFolder, $"{appId}--{ip.Replace(":","0.")}--{Path.GetRandomFileName()}");
+            // 对文件进行 MD5 校验
+            if (md5Headers.Count == 0)
+            {
+                throw new Exception("客户端请求缺少必要的 Header 信息：Content-MD5。");
+            }
+            using (MemoryStream stream = new MemoryStream(Convert.ToInt32(formFile.Length)))
+            {
+                formFile.CopyTo(stream);
+                if (md5Headers[0] != Convert.ToBase64String(MD5.Create().ComputeHash(stream.ToArray())))
+                {
+                    throw new Exception($"上传的文件 MD5 校对失败，服务器端收到的文件长度为{formFile.Length}byte，请核对文件是否被修改。");
+                }
+            }
+
+            string path = LogPackageProcessor.CreateLogPackageFileName(appId, ip);
             using (var stream = new FileStream(path + ".temp", FileMode.Create))
             {
                 formFile.CopyTo(stream);
