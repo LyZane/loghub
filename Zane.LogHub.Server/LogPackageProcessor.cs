@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Zane.LogHub.Client;
 
 namespace Zane.LogHub.Server
 {
@@ -56,10 +57,15 @@ namespace Zane.LogHub.Server
             while (true)
             {
 
-                var files = Directory.GetFiles(WorkFolder, "*.zip", SearchOption.TopDirectoryOnly);
-                if (files.Length >0)
+                var packages = Directory.GetFiles(WorkFolder, "*.zip", SearchOption.TopDirectoryOnly);
+                if (packages.Length >0)
                 {
-                    Parallel.ForEach(files,new ParallelOptions() { MaxDegreeOfParallelism=1 }, path => {
+                    // 并行解压缩
+                    Parallel.ForEach(packages,new ParallelOptions() { MaxDegreeOfParallelism=1 }, path => {
+                        Extract(path);
+                    });
+                    var logs = Directory.GetFiles(WorkFolder, "*.log", SearchOption.AllDirectories);
+                    Parallel.ForEach(logs, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, path => {
                         Core(path);
                     });
                 }
@@ -71,10 +77,22 @@ namespace Zane.LogHub.Server
         }
 
         /// <summary>
-        /// 单个 LogPackage 的处理流程
+        /// 处理一个 log 文件
+        /// </summary>
+        private static void Core(string path)
+        {
+            if (!File.Exists(path))
+            {
+                return;
+            }
+            LogEntity log = File.ReadAllText(path,Encoding.UTF8).Convert2Model<LogEntity>();
+        }
+
+        /// <summary>
+        /// 将 LogPackage.zip 解压后删除。
         /// </summary>
         /// <param name="path"></param>
-        private static void Core(string path)
+        private static void Extract(string path)
         {
             var package = new FileInfo(path);
             if (!package.Exists)

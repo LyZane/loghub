@@ -100,7 +100,7 @@ namespace Zane.LogHub.Client
             {
                 foreach (var item in package)
                 {
-                    ZipArchiveEntry entity = zipArchive.CreateEntry(item.Item1.Id + ".txt");
+                    ZipArchiveEntry entity = zipArchive.CreateEntry(item.Item1.Id + ".log");
                     using (StreamWriter writer = new StreamWriter(entity.Open()))
                     {
                         writer.Write(item.Item2);

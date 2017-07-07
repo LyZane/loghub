@@ -6,6 +6,7 @@ namespace Zane.LogHub.Client
 {
     public class LogEntity
     {
+        public LogEntity() { }
         public LogEntity(string tag, string title, params ContentEntity[] contents)
         {
             this.Id = Guid.NewGuid().ToString();
