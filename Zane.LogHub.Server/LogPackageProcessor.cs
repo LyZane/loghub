@@ -53,19 +53,26 @@ namespace Zane.LogHub.Server
             {
                 throw new MethodAccessException("Must be after Init.");
             }
+            ParallelOptions parallelOptions = new ParallelOptions();// { MaxDegreeOfParallelism = 4 };
 
             while (true)
             {
 
                 var packages = Directory.GetFiles(WorkFolder, "*.zip", SearchOption.TopDirectoryOnly);
-                if (packages.Length >0)
+                if (packages.Length > 0)
                 {
                     // 并行解压缩
-                    Parallel.ForEach(packages,new ParallelOptions() { MaxDegreeOfParallelism=1 }, path => {
+                    Parallel.ForEach(packages, parallelOptions, path =>
+                    {
                         Extract(path);
                     });
-                    var logs = Directory.GetFiles(WorkFolder, "*.log", SearchOption.AllDirectories);
-                    Parallel.ForEach(logs, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, path => {
+                }
+
+                var logs = Directory.GetFiles(WorkFolder, "*.log", SearchOption.AllDirectories);
+                if (logs.Length > 0)
+                {
+                    Parallel.ForEach(logs, parallelOptions, path =>
+                    {
                         Core(path);
                     });
                 }
@@ -85,7 +92,15 @@ namespace Zane.LogHub.Server
             {
                 return;
             }
-            LogEntity log = File.ReadAllText(path,Encoding.UTF8).Convert2Model<LogEntity>();
+            LogEntity log = File.ReadAllText(path, Encoding.UTF8).Convert2Model<LogEntity>();
+            if (log.Populate())
+            {
+                File.Delete(path);
+            }
+            else
+            {
+
+            }
         }
 
         /// <summary>
@@ -101,7 +116,7 @@ namespace Zane.LogHub.Server
             }
             // 修改文件名，标记此 LogPackage 处于被处理中。
             File.Move(path, path + ".processing");
-            
+
             var temp = ResolveFileName(package.Name);
             string extractFolder = Path.Combine(WorkFolder, temp.appId, temp.ip);
 
@@ -131,7 +146,7 @@ namespace Zane.LogHub.Server
             return (appId, ip);
         }
 
-        internal static string CreateLogPackageFileName(string appId,string ip)
+        internal static string CreateLogPackageFileName(string appId, string ip)
         {
             return Path.Combine(WorkFolder, $"{appId}--{ip.Replace(":", "0.")}--{Path.GetRandomFileName()}");
         }

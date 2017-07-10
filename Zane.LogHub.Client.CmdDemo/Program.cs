@@ -23,8 +23,8 @@ namespace Zane.LogHub.Client.CmdDemo
 
             while (true)
             {
-                Console.WriteLine("按任意键写入一条日志：");
-                Console.ReadKey();
+                //Console.WriteLine("按任意键写入一条日志：");
+                //Console.ReadKey();
                 Logger.Log("Unit Test", DateTime.Now.ToString(), AppDomain.CurrentDomain);
                 Thread.Sleep(1);
             }
