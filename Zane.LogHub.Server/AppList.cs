@@ -9,6 +9,7 @@ namespace Zane.LogHub.Server
         private static readonly Dictionary<string, AppItem> Apps = new Dictionary<string, AppItem>();
         static AppList()
         {
+            
             AppItem app = new AppItem("TestApp","TestToken");
             Add(app);
         }
