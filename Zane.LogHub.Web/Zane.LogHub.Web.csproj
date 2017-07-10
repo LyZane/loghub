@@ -17,6 +17,11 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="AdminLTE-2.4.0-rc\bower_components\bootstrap-datepicker\.github\ISSUE_TEMPLATE.md" />
+    <None Include="AdminLTE-2.4.0-rc\bower_components\bootstrap-datepicker\.github\PULL_REQUEST_TEMPLATE.md" />
+    <None Include="AdminLTE-2.4.0-rc\bower_components\ckeditor\.github\ISSUE_TEMPLATE" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Zane.LogHub.Server\Zane.LogHub.Server.csproj" />
   </ItemGroup>
 
