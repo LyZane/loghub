@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zane.LogHub.Web", "Zane.LogHub.Web\Zane.LogHub.Web.csproj", "{3C9A0117-FCDE-469F-933B-DCE5C254E923}"
 EndProject
@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zane.LogHub.Client.Test", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zane.LogHub.Client.CmdDemo", "Zane.LogHub.Client.CmdDemo\Zane.LogHub.Client.CmdDemo.csproj", "{A628A400-D395-4E5D-94D2-F4075B4E1A27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Playground", "Test.Playground\Test.Playground.csproj", "{532320A5-29DB-4073-A0FC-7214C81A22E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Playground", "Test.Playground\Test.Playground.csproj", "{532320A5-29DB-4073-A0FC-7214C81A22E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zane.LogHub.Server.Test", "Zane.LogHub.Server.Test\Zane.LogHub.Server.Test.csproj", "{2EDE6FFD-B425-4B1D-8809-261C7AD13641}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{532320A5-29DB-4073-A0FC-7214C81A22E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{532320A5-29DB-4073-A0FC-7214C81A22E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{532320A5-29DB-4073-A0FC-7214C81A22E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EDE6FFD-B425-4B1D-8809-261C7AD13641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EDE6FFD-B425-4B1D-8809-261C7AD13641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EDE6FFD-B425-4B1D-8809-261C7AD13641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EDE6FFD-B425-4B1D-8809-261C7AD13641}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

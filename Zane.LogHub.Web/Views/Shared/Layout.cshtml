@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -531,8 +531,13 @@
     <script src="/resource/bower_components/fastclick/lib/fastclick.js"></script>
     <!-- AdminLTE App -->
     <script src="/resource/dist/js/adminlte.min.js"></script>
-    
-    
-    @RenderSection("scripts", required: false)
+    <script src="/resource/plugins/artTemplate/template-web.js"></script>
+    <script src="/resource/zane/zane.common.js"></script>
+    <script>
+        var uri = parseURL(window.location.href);
+        var currentLink = $(".sidebar-menu a[href*='" + decodeURIComponent(uri.relative.substr(1)) + "']");
+        currentLink.parents("li").addClass("active");
+    </script>
+    @RenderSection("BodyEnd", required: false)
 </body>
 </html>

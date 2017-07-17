@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Threading;
 
@@ -20,12 +20,12 @@ namespace Zane.LogHub.Client.CmdDemo
             //Logger.Log("Unit Test", DateTime.Now.ToString(), DateTime.Now);
             //Console.WriteLine("loged");
             //return;
-
+            Random ran = new Random();
             while (true)
             {
                 //Console.WriteLine("按任意键写入一条日志：");
                 //Console.ReadKey();
-                Logger.Log("Unit Test", DateTime.Now.ToString(), AppDomain.CurrentDomain);
+                Logger.Log("Unit Test"+ran.Next(100,999), DateTime.Now.ToString(), AppDomain.CurrentDomain);
                 Thread.Sleep(1);
             }
 

@@ -7321,18 +7321,21 @@
     <Content Include="wwwroot\resource\bower_components\select2\tests\vendor\qunit-1.23.1.css" />
     <Content Include="wwwroot\resource\bower_components\select2\tests\vendor\qunit-1.23.1.js" />
     <Content Include="wwwroot\resource\bower_components\select2\vendor\jquery-2.1.0.js" />
+    <Content Include="wwwroot\resource\plugins\artTemplate\template-web.js" />
     <Content Include="wwwroot\resource\plugins\input-mask\phone-codes\phone-be.json">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="wwwroot\resource\plugins\input-mask\phone-codes\phone-codes.json">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <Content Include="wwwroot\resource\zane\zane.common.js" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Views\Home\" />
     <Folder Include="Views\Shared\" />
     <Folder Include="Content\" />
+    <Folder Include="Views\Log\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
