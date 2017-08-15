@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zane.LogHub.Web", "Zane.LogHub.Web\Zane.LogHub.Web.csproj", "{3C9A0117-FCDE-469F-933B-DCE5C254E923}"
 EndProject
@@ -15,9 +15,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zane.LogHub.Client.CmdDemo"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Playground", "Test.Playground\Test.Playground.csproj", "{532320A5-29DB-4073-A0FC-7214C81A22E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zane.LogHub.Server.Test", "Zane.LogHub.Server.Test\Zane.LogHub.Server.Test.csproj", "{2EDE6FFD-B425-4B1D-8809-261C7AD13641}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zane.LogHub.Server.Test", "Zane.LogHub.Server.Test\Zane.LogHub.Server.Test.csproj", "{2EDE6FFD-B425-4B1D-8809-261C7AD13641}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
